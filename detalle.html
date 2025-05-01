@@ -56,7 +56,8 @@
       display: none;
       cursor: pointer;
     }
-    .arrow {
+
+.arrow {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
@@ -76,6 +77,25 @@
       #fullscreenModal .arrow {
         display: block;
       }
+    }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #888;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    .dot.active {
+      background: #FFD700;
+      opacity: 1;
     }
 
     #whatsapp {
@@ -137,95 +157,100 @@
     <button class="arrow right" onclick="nextFullscreen()">›</button>
     <button onclick="closeFullscreen()" style="position:absolute;bottom:20px;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
   </div>
+<script>
+  let currentIndex = 0;
+  let timer;
+  let fullscreenImages = [];
+  let fullscreenIndex = 0;
 
-  <script>
-    let currentIndex = 0;
-    let timer;
-    let fullscreenImages = [];
-    let fullscreenIndex = 0;
-
-    function showImage(index) {
-      const slides = document.querySelectorAll(".slide");
-      slides.forEach((slide, i) => {
-        slide.style.display = i === index ? "block" : "none";
-      });
-    }
-
-    function nextImage() {
-      const slides = document.querySelectorAll(".slide");
-      currentIndex = (currentIndex + 1) % slides.length;
-      showImage(currentIndex);
-    }
-
-    function prevImage() {
-      const slides = document.querySelectorAll(".slide");
-      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-      showImage(currentIndex);
-    }
-
-    function startCarousel() {
-      timer = setInterval(nextImage, 5000);
-    }
-
-    function openFullscreen(src) {
-      const modal = document.getElementById("fullscreenModal");
-      const img = document.getElementById("fullscreenImage");
-      fullscreenImages = Array.from(document.querySelectorAll(".slide")).map(i => i.src);
-      fullscreenIndex = fullscreenImages.indexOf(src);
-      img.src = src;
-      modal.style.display = "flex";
-    }
-
-    function nextFullscreen() {
-      fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
-      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
-    }
-
-    function prevFullscreen() {
-      fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
-      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
-    }
-
-    function closeFullscreen() {
-      document.getElementById("fullscreenModal").style.display = "none";
-    }
-
-    let startX = 0;
-    document.getElementById("fullscreenModal").addEventListener("touchstart", e => {
-      startX = e.touches[0].clientX;
+  function showImage(index) {
+    const slides = document.querySelectorAll(".slide");
+    const dots = document.querySelectorAll(".dot");
+    slides.forEach((slide, i) => {
+      slide.style.display = i === index ? "block" : "none";
+      if (dots[i]) dots[i].classList.toggle("active", i === index);
     });
-    document.getElementById("fullscreenModal").addEventListener("touchend", e => {
-      const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) nextFullscreen();
-      else if (endX - startX > 50) prevFullscreen();
-    });
+    currentIndex = index;
+  }
 
-    const car = JSON.parse(localStorage.getItem("car"));
-    const detail = document.getElementById("detail");
+  function nextImage() {
+    const slides = document.querySelectorAll(".slide");
+    currentIndex = (currentIndex + 1) % slides.length;
+    showImage(currentIndex);
+  }
 
-    if (car) {
-      detail.innerHTML = `
-        <h2>${car.title}</h2>
-        <div class="images">
-          ${car.images.map((img, i) => `
-            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="display:${i === 0 ? 'block' : 'none'};" />
-          `).join("")}
+  function prevImage() {
+    const slides = document.querySelectorAll(".slide");
+    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+    showImage(currentIndex);
+  }
+
+  function startCarousel() {
+    timer = setInterval(nextImage, 5000);
+  }
+
+  function openFullscreen(src) {
+    const modal = document.getElementById("fullscreenModal");
+    const img = document.getElementById("fullscreenImage");
+    fullscreenImages = Array.from(document.querySelectorAll(".slide")).map(i => i.src);
+    fullscreenIndex = fullscreenImages.indexOf(src);
+    img.src = src;
+    modal.style.display = "flex";
+  }
+
+  function nextFullscreen() {
+    fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
+    document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+  }
+
+  function prevFullscreen() {
+    fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
+    document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+  }
+
+  function closeFullscreen() {
+    document.getElementById("fullscreenModal").style.display = "none";
+  }
+
+  let startX = 0;
+  document.getElementById("fullscreenModal").addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+  });
+  document.getElementById("fullscreenModal").addEventListener("touchend", e => {
+    const endX = e.changedTouches[0].clientX;
+    if (startX - endX > 50) nextFullscreen();
+    else if (endX - startX > 50) prevFullscreen();
+  });
+
+  const car = JSON.parse(localStorage.getItem("car"));
+  const detail = document.getElementById("detail");
+
+  if (car) {
+    detail.innerHTML = `
+      <h2>${car.title}</h2>
+      <div class="images">
+        ${car.images.map((img, i) => `
+          <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="display:${i === 0 ? 'block' : 'none'};" />
+        `).join("")}
+        <div class="dots">
+          ${car.images.map((_, i) => `<div class="dot${i === 0 ? ' active' : ''}" onclick="showImage(${i})"></div>`).join("")}
         </div>
-        <div class="grid">
-          <div class="info-box"><strong>Precio:</strong> ${car.price}</div>
-          <div class="info-box"><strong>Modelo:</strong> ${car.model}</div>
-          <div class="info-box"><strong>Marca:</strong> ${car.brand}</div>
-          <div class="info-box"><strong>Transmisión:</strong> ${car.transmission}</div>
-          <div class="info-box"><strong>Combustible:</strong> ${car.fuel}</div>
-        </div>
-        <p>${car.description}</p>
-      `;
-      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
-      showImage(0);
-      startCarousel();
-    } else {
-      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
-    }
-  </script>
+      </div>
+      <div class="grid">
+        <div class="info-box"><strong>Precio:</strong> ${car.price}</div>
+        <div class="info-box"><strong>Modelo:</strong> ${car.model}</div>
+        <div class="info-box"><strong>Marca:</strong> ${car.brand}</div>
+        <div class="info-box"><strong>Transmisión:</strong> ${car.transmission}</div>
+        <div class="info-box"><strong>Combustible:</strong> ${car.fuel}</div>
+      </div>
+      <p>${car.description}</p>
+    `;
+    document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+    showImage(0);
+    startCarousel();
+  } else {
+    detail.innerHTML = "<p>No se encontró el vehículo.</p>";
+  }
+</script>
 </body>
 </html>
