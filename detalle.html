@@ -16,6 +16,7 @@
     h1, h2 {
       color: #FFD700;
       text-align: center;
+      margin-top: 0;
     }
     .container {
       background: #1e1e1e;
@@ -56,26 +57,6 @@
       display: none;
       cursor: pointer;
     }
-    .actions {
-      margin-top: 2rem;
-    }
-    .btn-wsp {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: #25D366;
-      border-radius: 50%;
-      width: 55px;
-      height: 55px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    .btn-wsp img {
-      width: 30px;
-      height: 30px;
-    }
     .arrow {
       position: absolute;
       top: 50%;
@@ -83,31 +64,82 @@
       background: rgba(255, 215, 0, 0.8);
       border: none;
       padding: 0.5rem;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       cursor: pointer;
       z-index: 10;
-      border-radius: 4px;
+      border-radius: 6px;
       display: none;
     }
-    .arrow.left { left: 10px; }
-    .arrow.right { right: 10px; }
+    .arrow.left { left: 15px; }
+    .arrow.right { right: 15px; }
 
     @media (min-width: 768px) {
-      .arrow { display: block; }
+      #fullscreenModal .arrow {
+        display: block;
+      }
+    }
+
+    #whatsapp {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #25D366;
+      border-radius: 50%;
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px #000;
+      z-index: 9999;
+    }
+    #whatsapp img {
+      width: 30px;
+      height: 30px;
+    }
+
+    #back-button {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      background: #FFD700;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      box-shadow: 0 0 10px #000;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    #back-button img {
+      width: 20px;
+      height: 20px;
     }
   </style>
 </head>
 <body>
-  <a id="whatsapp" class="btn-wsp" target="_blank">
-    <img src="https://img.icons8.com/ios-filled/50/ffffff/whatsapp.png" alt="WhatsApp">
+  <!-- Botón WhatsApp flotante -->
+  <a id="whatsapp" target="_blank">
+    <img src="https://img.icons8.com/ios-filled/50/ffffff/whatsapp--v1.png" alt="WhatsApp" />
+  </a>
+
+  <!-- Botón de regresar -->
+  <a id="back-button" href="index.html" title="Regresar al menú">
+    <img src="https://img.icons8.com/ios-filled/50/000000/left.png" alt="Regresar" />
   </a>
 
   <h1>Detalle del Vehículo</h1>
   <div class="container" id="detail"></div>
 
-  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;">
+  <!-- Modal pantalla completa -->
+  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;">
+    <button class="arrow left" onclick="prevImage()">‹</button>
     <img id="fullscreenImage" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;touch-action:manipulation;" />
-    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
+    <button class="arrow right" onclick="nextImage()">›</button>
+    <button onclick="closeFullscreen()" style="position:absolute;bottom:20px;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
   </div>
 
   <script>
@@ -152,7 +184,6 @@
       document.getElementById("fullscreenModal").style.display = "none";
     }
 
-    // Deslizar en pantalla completa (móvil)
     let startX = 0;
     document.getElementById("fullscreenModal").addEventListener("touchstart", e => {
       startX = e.touches[0].clientX;
@@ -175,10 +206,8 @@
         <h2>${car.title}</h2>
         <div class="images">
           ${car.images.map((img, i) => `
-            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="display:${i === 0 ? 'block' : 'none'}" />
+            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="display:${i === 0 ? 'block' : 'none'};" />
           `).join("")}
-          <button class="arrow left" onclick="prevImage()">‹</button>
-          <button class="arrow right" onclick="nextImage()">›</button>
         </div>
         <div class="grid">
           <div class="info-box"><strong>Precio:</strong> ${car.price}</div>
@@ -190,6 +219,7 @@
         <p>${car.description}</p>
       `;
       document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+      showImage(0);
       startCarousel();
     } else {
       detail.innerHTML = "<p>No se encontró el vehículo.</p>";
