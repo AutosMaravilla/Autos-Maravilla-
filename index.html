@@ -1,128 +1,147 @@
-<!DOCTYPE html><html lang="es">
+
+
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Autos Maravilla</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
       font-family: 'Roboto', sans-serif;
       background: #121212;
       color: white;
+      padding: 1rem;
     }
     header {
       display: flex;
       align-items: center;
-      padding: 1rem;
-      background: #000;
-      justify-content: center;
+      margin-bottom: 2rem;
     }
     header img {
       height: 50px;
       margin-right: 1rem;
+      border-radius: 5px;
     }
-    header h1 {
-      font-size: 1.5rem;
+    h1 {
       color: #FFD700;
-      margin: 0;
+    }
+    .car {
+      background: #1e1e1e;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .car:hover {
+      transform: scale(1.015);
+      box-shadow: 0 6px 18px rgba(255, 215, 0, 0.2);
+    }
+    .car img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+    .car h2 {
+      color: #FFD700;
+      margin: 0.5rem 0;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .car p {
+      margin: 0.2rem 0;
+      font-size: 0.95rem;
     }
     #search {
-      width: calc(100% - 2rem);
-      margin: 1rem;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border: 2px solid #FFD700;
-      border-radius: 8px;
-      background: #1e1e1e;
-      color: white;
-      transition: border-color 0.3s;
-    }
-    #search:focus {
-      outline: none;
-      border-color: #fff;
-    }
-    #carList {
-      padding: 1rem;
-    }
-    .card {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeInUp 0.6s ease forwards;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 16px rgba(255,215,0,0.4);
-    }
-    .card img {
       width: 100%;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-    .card h2 {
-      color: #FFD700;
-      margin: 0 0 0.5rem 0;
-      letter-spacing: 0.5px;
-    }
-    .card p {
-      margin: 0.25rem 0;
+      padding: 0.6rem;
       font-size: 1rem;
-    }
-    .card p strong {
-      color: #FFD700;
-    }
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      border-radius: 5px;
+      border: 2px solid #FFD700;
+      margin-bottom: 1.5rem;
+      background: #333;
+      color: white;
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Logo Autos Maravilla">
+    <img src="https://i.postimg.cc/8zXCkRFm/Imagen-de-Whats-App-2025-04-29-a-las-12-02-33-41dfd301.jpg" alt="Logo Autos Maravilla" />
     <h1>Autos Maravilla</h1>
   </header>
+
   <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
-  <div id="carList"></div>  <script>
-    const carList = document.getElementById("carList");
+  <div id="catalog"></div>
+
+  <!-- Botones sociales estilo Autos Maravilla -->
+  <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
+    <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
+      <img src="https://img.icons8.com/ios-filled/50/FFD700/whatsapp--v1.png"
+           style="width:45px;height:45px;background:black;padding:6px;border-radius:50%;" />
+    </a>
+    <a href="https://www.facebook.com/share/166GyVSaGW/" target="_blank">
+      <img src="https://img.icons8.com/ios-filled/50/FFD700/facebook-new.png"
+           style="width:45px;height:45px;background:black;padding:6px;border-radius:50%;" />
+    </a>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBcoM5H6GLk7Gqb-Dd-t6frp-AKjgeQZCQ",
+      authDomain: "autos-maravilla-fb60f.firebaseapp.com",
+      projectId: "autos-maravilla-fb60f",
+      storageBucket: "autos-maravilla-fb60f.appspot.com",
+      messagingSenderId: "848697544786",
+      appId: "1:848697544786:web:9ff4ac2374f43b886cf8b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const catalog = document.getElementById("catalog");
     const searchInput = document.getElementById("search");
 
-    const cars = JSON.parse(localStorage.getItem("cars")) || [];
-
-    function displayCars(filteredCars) {
-      carList.innerHTML = "";
-      filteredCars.forEach(car => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.onclick = () => {
-          localStorage.setItem("car", JSON.stringify(car));
-          window.location.href = "detalle.html";
-        };
-        card.innerHTML = `
-          <img src="${car.images[0]}" alt="imagen">
+    function render(cars) {
+      catalog.innerHTML = "";
+      cars.forEach(doc => {
+        const car = doc.data();
+        const div = document.createElement("div");
+        div.className = "car";
+        div.innerHTML = `
+          <img src="${car.images[0]}" alt="imagen del vehículo">
           <h2>${car.title}</h2>
           <p><strong>Precio:</strong> ${car.price}</p>
         `;
-        carList.appendChild(card);
+        div.onclick = () => {
+          localStorage.setItem("car", JSON.stringify(car));
+          window.location.href = "detalle.html";
+        };
+        catalog.appendChild(div);
       });
     }
 
-    searchInput.addEventListener("input", () => {
-      const term = searchInput.value.toLowerCase();
-      const filtered = cars.filter(car => car.title.toLowerCase().includes(term));
-      displayCars(filtered);
+    let allCars = [];
+    db.collection("vehiculos").onSnapshot(snapshot => {
+      allCars = snapshot.docs;
+      render(allCars);
     });
 
-    displayCars(cars);
-  </script></body>
+    searchInput.addEventListener("input", e => {
+      const val = e.target.value.toLowerCase();
+      const filtered = allCars.filter(doc => doc.data().title.toLowerCase().includes(val));
+      render(filtered);
+    });
+  </script>
+</body>
 </html>
+
+
+
