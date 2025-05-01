@@ -49,6 +49,9 @@
       font-weight: bold;
       cursor: pointer;
     }
+    #fullscreenModal img {
+      touch-action: pan-y pinch-zoom;
+    }
   </style>
 </head>
 <body>
@@ -60,9 +63,11 @@
   </div>
 
   <!-- Modal de imagen -->
-  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;">
-    <img id="fullscreenImage" style="max-width:100%;max-height:100%;border-radius:8px;" />
-    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
+  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;overflow:hidden;">
+    <div id="swiper" style="display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+      <!-- imágenes se insertarán dinámicamente -->
+    </div>
+    <button onclick="closeFullscreen()" style="position:absolute;bottom:20px;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
   </div>
 
   <script>
@@ -80,7 +85,7 @@
         <p>${car.description}</p>
         <div style="position:relative;overflow:hidden;">
           ${car.images.map((img, i) => `
-            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" 
+            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(${i})"
               style="width:100%;max-height:500px;object-fit:cover;cursor:pointer;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />
           `).join("")}
         </div>
@@ -90,10 +95,13 @@
       detail.innerHTML = "<p>No se encontró el vehículo.</p>";
     }
 
-    function openFullscreen(src) {
+    function openFullscreen(startIndex = 0) {
       const modal = document.getElementById("fullscreenModal");
-      const img = document.getElementById("fullscreenImage");
-      img.src = src;
+      const swiper = document.getElementById("swiper");
+      swiper.innerHTML = car.images.map((img, i) => `
+        <img src="${img}" style="min-width:100%;height:100%;object-fit:contain;scroll-snap-align:center;" />
+      `).join("");
+      swiper.scrollLeft = startIndex * swiper.clientWidth;
       modal.style.display = "flex";
     }
 
