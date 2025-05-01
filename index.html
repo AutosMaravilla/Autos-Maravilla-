@@ -1,12 +1,10 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
   <title>Autos Maravilla</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -26,6 +24,33 @@
     }
     h1 {
       color: #FFD700;
+    }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .filters input {
+      flex: 1;
+      padding: 0.6rem 2.5rem 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 2px solid #FFD700;
+      background: #333;
+      color: white;
+      background-image: url('https://img.icons8.com/ios-filled/20/FFD700/search--v1.png');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 18px;
+    }
+    .filters select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #FFD700;
+      background: #1e1e1e;
+      color: white;
     }
     .car {
       background: #1e1e1e;
@@ -58,30 +83,30 @@
       margin: 0.2rem 0;
       font-size: 0.95rem;
     }
-    #search {
-      width: 100%;
-      padding: 0.6rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 2px solid #FFD700;
-      margin-bottom: 1.5rem;
-      background: #333;
-      color: white;
-    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <header>
-    <img src="https://i.postimg.cc/8zXCkRFm/Imagen-de-Whats-App-2025-04-29-a-las-12-02-33-41dfd301.jpg" alt="Logo Autos Maravilla" />
+    <img src="https://i.postimg.cc/8zXCkRFm/Imagen-de-Whats-App-2025-04-29-a-las-12-02-33-41dfd301.jpg" alt="Logo" />
     <h1>Autos Maravilla</h1>
   </header>
 
-  <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
+  <div class="filters">
+    <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
+    <select id="brandFilter">
+      <option value="">Todas</option>
+      <option value="Toyota">Toyota</option>
+      <option value="Mazda">Mazda</option>
+      <option value="Hyundai">Hyundai</option>
+      <option value="Mitsubishi">Mitsubishi</option>
+    </select>
+  </div>
+
   <div id="catalog"></div>
 
-  <!-- Botones sociales estilo Autos Maravilla -->
+  <!-- Botones sociales -->
   <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
     <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
       <img src="https://img.icons8.com/ios-filled/50/FFD700/whatsapp--v1.png"
@@ -108,6 +133,7 @@
 
     const catalog = document.getElementById("catalog");
     const searchInput = document.getElementById("search");
+    const brandFilter = document.getElementById("brandFilter");
 
     function render(cars) {
       catalog.innerHTML = "";
@@ -131,17 +157,23 @@
     let allCars = [];
     db.collection("vehiculos").onSnapshot(snapshot => {
       allCars = snapshot.docs;
-      render(allCars);
+      applyFilters();
     });
 
-    searchInput.addEventListener("input", e => {
-      const val = e.target.value.toLowerCase();
-      const filtered = allCars.filter(doc => doc.data().title.toLowerCase().includes(val));
+    function applyFilters() {
+      const term = searchInput.value.toLowerCase();
+      const brand = brandFilter.value.toLowerCase();
+      const filtered = allCars.filter(doc => {
+        const data = doc.data();
+        const matchesText = data.title.toLowerCase().includes(term);
+        const matchesBrand = !brand || data.title.toLowerCase().includes(brand);
+        return matchesText && matchesBrand;
+      });
       render(filtered);
-    });
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    brandFilter.addEventListener("change", applyFilters);
   </script>
 </body>
 </html>
-
-
-
