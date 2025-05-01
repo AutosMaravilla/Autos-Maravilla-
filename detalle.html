@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Detalle del Vehículo</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
@@ -61,70 +61,11 @@
 
   <!-- Modal de imagen -->
   <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;">
-    <img id="fullscreenImage" style="max-width:100%;max-height:100%;object-fit:contain;touch-action:manipulation;transform-origin:center center;border-radius:8px;" />
+    <img id="fullscreenImage" style="max-width:100%;max-height:100%;border-radius:8px;" />
     <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
   </div>
 
   <script>
-    let currentIndex = 0;
-    let timer;
-    let fullscreenImages = [];
-    let fullscreenIndex = 0;
-
-    function showImage(index) {
-      const slides = document.querySelectorAll(".slide");
-      slides.forEach((slide, i) => {
-        slide.style.display = i === index ? "block" : "none";
-      });
-    }
-
-    function nextImage() {
-      const slides = document.querySelectorAll(".slide");
-      currentIndex = (currentIndex + 1) % slides.length;
-      showImage(currentIndex);
-    }
-
-    function prevImage() {
-      const slides = document.querySelectorAll(".slide");
-      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-      showImage(currentIndex);
-    }
-
-    function startCarousel() {
-      timer = setInterval(nextImage, 5000);
-    }
-
-    function openFullscreen(src) {
-      const modal = document.getElementById("fullscreenModal");
-      const img = document.getElementById("fullscreenImage");
-
-      // Cargar todas las imágenes
-      fullscreenImages = Array.from(document.querySelectorAll(".slide")).map(i => i.src);
-      fullscreenIndex = fullscreenImages.indexOf(src);
-
-      img.src = src;
-      modal.style.display = "flex";
-    }
-
-    function closeFullscreen() {
-      document.getElementById("fullscreenModal").style.display = "none";
-    }
-
-    // Deslizamiento táctil
-    let startX = 0;
-    document.getElementById("fullscreenModal").addEventListener("touchstart", (e) => {
-      startX = e.touches[0].clientX;
-    });
-    document.getElementById("fullscreenModal").addEventListener("touchend", (e) => {
-      const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) {
-        fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
-      } else if (endX - startX > 50) {
-        fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
-      }
-      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
-    });
-
     const car = JSON.parse(localStorage.getItem("car"));
     const detail = document.getElementById("detail");
 
@@ -137,14 +78,27 @@
         <p><strong>Transmisión:</strong> ${car.transmission}</p>
         <p><strong>Combustible:</strong> ${car.fuel}</p>
         <p>${car.description}</p>
-        <div style="position:relative;">
-          ${car.images.map((img, i) => `<img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="width:100%;max-height:300px;object-fit:contain;cursor:pointer;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />`).join("")}
+        <div style="position:relative;overflow:hidden;">
+          ${car.images.map((img, i) => `
+            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" 
+              style="width:100%;max-height:500px;object-fit:cover;cursor:pointer;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />
+          `).join("")}
         </div>
       `;
       document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
-      startCarousel();
     } else {
       detail.innerHTML = "<p>No se encontró el vehículo.</p>";
+    }
+
+    function openFullscreen(src) {
+      const modal = document.getElementById("fullscreenModal");
+      const img = document.getElementById("fullscreenImage");
+      img.src = src;
+      modal.style.display = "flex";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreenModal").style.display = "none";
     }
   </script>
 </body>
