@@ -1,61 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Autos Maravilla</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #121212;
-      color: white;
-      padding: 1rem;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    header img {
-      height: 50px;
-      margin-right: 1rem;
-      border-radius: 5px;
-    }
-    h1 {
-      color: #FFD700;
-    }
-    .filters {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .filters input {
-      flex: 1;
-      padding: 0.6rem 2.5rem 0.6rem 1rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 2px solid #FFD700;
-      background: #333;
-      color: white;
-      background-image: url('https://img.icons8.com/ios-filled/20/FFD700/search--v1.png');
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 18px;
-    }
-    .filters select {
-      padding: 0.6rem 0.6rem 0.6rem 2rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 2px solid #FFD700;
-      background: #1e1e1e;
-      color: white;
-      background-image: url('https://img.icons8.com/ios-filled/20/FFD700/filter--v1.png');
-      background-repeat: no-repeat;
-      background-position: 8px center;
-      background-size: 18px;
-    }
+    body { font-family: 'Roboto', sans-serif; background: #121212; color: white; padding: 1rem; }
+    header { display: flex; align-items: center; margin-bottom: 2rem; }
+    header img { height: 50px; margin-right: 1rem; border-radius: 6px; }
+    h1 { color: #FFD700; }
     .car {
       background: #1e1e1e;
       padding: 1rem;
@@ -87,30 +41,57 @@
       margin: 0.2rem 0;
       font-size: 0.95rem;
     }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .filters input, .filters select {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+    }
+    #search {
+      flex: 1;
+      background: #333;
+      color: white;
+    }
+    #brandFilter {
+      width: 40px;
+      background: #FFD700 url('https://img.icons8.com/ios-filled/24/000000/filter.png') no-repeat center;
+      background-size: 20px;
+      text-indent: -9999px;
+    }
+    #priceSort {
+      background: #333;
+      color: white;
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <header>
-    <img src="https://i.postimg.cc/8zXCkRFm/Imagen-de-Whats-App-2025-04-29-a-las-12-02-33-41dfd301.jpg" alt="Logo" />
+    <img src="https://i.postimg.cc/8zXCkRFm/Imagen-de-Whats-App-2025-04-29-a-las-12-02-33-41dfd301.jpg" alt="Logo Autos Maravilla" />
     <h1>Autos Maravilla</h1>
   </header>
 
   <div class="filters">
     <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
-    <select id="brandFilter">
-      <option value="">Todas</option>
-      <option value="Toyota">Toyota</option>
-      <option value="Mazda">Mazda</option>
-      <option value="Hyundai">Hyundai</option>
-      <option value="Mitsubishi">Mitsubishi</option>
+    <select id="brandFilter" title="Filtrar por marca">
+      <option value="Todas" selected></option>
+    </select>
+    <select id="priceSort">
+      <option value="default">Ordenar por precio</option>
+      <option value="asc">Más barato</option>
+      <option value="desc">Más caro</option>
     </select>
   </div>
 
   <div id="catalog"></div>
 
-  <!-- Botones sociales -->
   <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
     <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
       <img src="https://img.icons8.com/ios-filled/50/FFD700/whatsapp--v1.png"
@@ -138,6 +119,9 @@
     const catalog = document.getElementById("catalog");
     const searchInput = document.getElementById("search");
     const brandFilter = document.getElementById("brandFilter");
+    const priceSort = document.getElementById("priceSort");
+
+    let allCars = [];
 
     function render(cars) {
       catalog.innerHTML = "";
@@ -158,26 +142,50 @@
       });
     }
 
-    let allCars = [];
-    db.collection("vehiculos").onSnapshot(snapshot => {
-      allCars = snapshot.docs;
-      applyFilters();
-    });
+    function populateBrands(cars) {
+      const brands = [...new Set(cars.map(doc => doc.data().brand?.trim()).filter(Boolean))];
+      brands.sort();
+      brandFilter.innerHTML = '<option value="Todas" selected></option>';
+      brands.forEach(b => {
+        const option = document.createElement("option");
+        option.value = b;
+        option.textContent = b;
+        brandFilter.appendChild(option);
+      });
+    }
 
     function applyFilters() {
-      const term = searchInput.value.toLowerCase();
-      const brand = brandFilter.value.toLowerCase();
-      const filtered = allCars.filter(doc => {
-        const data = doc.data();
-        const matchesText = data.title.toLowerCase().includes(term);
-        const matchesBrand = !brand || data.title.toLowerCase().includes(brand);
-        return matchesText && matchesBrand;
+      const text = searchInput.value.toLowerCase();
+      const selectedBrand = brandFilter.value;
+      const sort = priceSort.value;
+
+      let filtered = allCars.filter(doc => {
+        const car = doc.data();
+        const matchesBrand = selectedBrand === "Todas" || car.brand === selectedBrand;
+        const matchesText = car.title.toLowerCase().includes(text);
+        return matchesBrand && matchesText;
       });
+
+      if (sort !== "default") {
+        filtered.sort((a, b) => {
+          const priceA = parseFloat(a.data().price.replace(/[^\d.]/g, ""));
+          const priceB = parseFloat(b.data().price.replace(/[^\d.]/g, ""));
+          return sort === "asc" ? priceA - priceB : priceB - priceA;
+        });
+      }
+
       render(filtered);
     }
 
+    db.collection("vehiculos").onSnapshot(snapshot => {
+      allCars = snapshot.docs;
+      render(allCars);
+      populateBrands(allCars);
+    });
+
     searchInput.addEventListener("input", applyFilters);
     brandFilter.addEventListener("change", applyFilters);
+    priceSort.addEventListener("change", applyFilters);
   </script>
 </body>
 </html>
