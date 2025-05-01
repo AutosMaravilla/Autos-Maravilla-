@@ -1,3 +1,5 @@
+Claro, aquí tienes el código completo del archivo index.html (para clientes), con el ajuste mínimo necesario para que el buscador filtre por título o marca sin alterar nada más de tu diseño o estructura:
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -162,7 +164,9 @@
       let filtered = allCars.filter(doc => {
         const car = doc.data();
         const matchesBrand = selectedBrand === "Todas" || car.brand === selectedBrand;
-        const matchesText = car.title.toLowerCase().includes(text);
+        const matchesText =
+          car.title.toLowerCase().includes(text) ||
+          (car.brand && car.brand.toLowerCase().includes(text));
         return matchesBrand && matchesText;
       });
 
@@ -189,3 +193,6 @@
   </script>
 </body>
 </html>
+
+¿Quieres que también busque por modelo o por descripción además de marca y título? Puedo ayudarte con eso también.
+
