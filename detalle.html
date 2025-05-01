@@ -10,62 +10,56 @@
       font-family: 'Roboto', sans-serif;
       background: #121212;
       color: white;
-      padding: 1rem;
       margin: 0;
+      padding: 1rem;
     }
     h1, h2 {
       color: #FFD700;
-      margin-top: 0;
+      text-align: center;
     }
     .container {
       background: #1e1e1e;
       padding: 1.5rem;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 10px #000;
       max-width: 900px;
       margin: auto;
-    }
-    .container p {
-      font-size: 1rem;
-      line-height: 1.6;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
     }
     .grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
       justify-content: space-between;
+      margin-top: 1rem;
     }
     .info-box {
       flex: 1 1 45%;
-      background-color: #1a1a1a;
-      padding: 1rem;
-      border-radius: 6px;
+      margin-bottom: 1rem;
     }
     .info-box strong {
       display: block;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.3rem;
       font-size: 1.1rem;
+    }
+    .container p {
+      white-space: pre-wrap;
+      line-height: 1.5;
     }
     .images {
       position: relative;
-      margin: 1rem 0;
+      margin-top: 1rem;
     }
-    .images img {
+    .slide {
       width: 100%;
       max-height: 400px;
       object-fit: contain;
       border-radius: 10px;
+      display: none;
+      cursor: pointer;
     }
     .actions {
-      margin-top: 1.5rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
+      margin-top: 2rem;
     }
-    .whatsapp-float {
+    .btn-wsp {
       position: fixed;
       top: 1rem;
       right: 1rem;
@@ -74,32 +68,47 @@
       width: 55px;
       height: 55px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      box-shadow: 0 0 10px #000;
+      justify-content: center;
       z-index: 9999;
     }
-    .whatsapp-float img {
+    .btn-wsp img {
       width: 30px;
       height: 30px;
     }
-    @media (max-width: 600px) {
-      .grid {
-        flex-direction: row;
-      }
-      .info-box {
-        flex: 1 1 45%;
-      }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 215, 0, 0.8);
+      border: none;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+      border-radius: 4px;
+      display: none;
+    }
+    .arrow.left { left: 10px; }
+    .arrow.right { right: 10px; }
+
+    @media (min-width: 768px) {
+      .arrow { display: block; }
     }
   </style>
 </head>
 <body>
-  <a id="whatsapp" class="whatsapp-float" target="_blank">
+  <a id="whatsapp" class="btn-wsp" target="_blank">
     <img src="https://img.icons8.com/ios-filled/50/ffffff/whatsapp.png" alt="WhatsApp">
   </a>
 
-  <h1 style="text-align:center;">Detalle del Vehículo</h1>
+  <h1>Detalle del Vehículo</h1>
   <div class="container" id="detail"></div>
+
+  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;">
+    <img id="fullscreenImage" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;touch-action:manipulation;" />
+    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
+  </div>
 
   <script>
     let currentIndex = 0;
@@ -107,32 +116,6 @@
     let fullscreenImages = [];
     let fullscreenIndex = 0;
 
-    const car = JSON.parse(localStorage.getItem("car"));
-    const detail = document.getElementById("detail");
-
-    if (car) {
-      detail.innerHTML = `
-        <h2>${car.title}</h2>
-        <div class="images">
-          ${car.images.map((img, i) => `
-            <img class="slide" src="${img}" alt="imagen" style="display:${i === 0 ? 'block' : 'none'}" />
-          `).join("")}
-        </div>
-        <div class="grid">
-          <div class="info-box"><strong>Precio:</strong>${car.price}</div>
-          <div class="info-box"><strong>Modelo:</strong>${car.model}</div>
-          <div class="info-box"><strong>Marca:</strong>${car.brand}</div>
-          <div class="info-box"><strong>Transmisión:</strong>${car.transmission}</div>
-          <div class="info-box"><strong>Combustible:</strong>${car.fuel}</div>
-        </div>
-        <p>${car.description}</p>
-      `;
-      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
-    } else {
-      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
-    }
-
-    // Carrusel auto y táctil
     function showImage(index) {
       const slides = document.querySelectorAll(".slide");
       slides.forEach((slide, i) => {
@@ -146,21 +129,71 @@
       showImage(currentIndex);
     }
 
-    timer = setInterval(nextImage, 5000);
+    function prevImage() {
+      const slides = document.querySelectorAll(".slide");
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showImage(currentIndex);
+    }
 
-    const modal = document.createElement('div');
+    function startCarousel() {
+      timer = setInterval(nextImage, 5000);
+    }
+
+    function openFullscreen(src) {
+      const modal = document.getElementById("fullscreenModal");
+      const img = document.getElementById("fullscreenImage");
+      fullscreenImages = Array.from(document.querySelectorAll(".slide")).map(i => i.src);
+      fullscreenIndex = fullscreenImages.indexOf(src);
+      img.src = src;
+      modal.style.display = "flex";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreenModal").style.display = "none";
+    }
+
+    // Deslizar en pantalla completa (móvil)
     let startX = 0;
-    document.body.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-    document.body.addEventListener("touchend", e => {
-      const endX = e.changedTouches[0].clientX;
-      if (endX - startX > 50) {
-        currentIndex = (currentIndex - 1 + car.images.length) % car.images.length;
-        showImage(currentIndex);
-      } else if (startX - endX > 50) {
-        currentIndex = (currentIndex + 1) % car.images.length;
-        showImage(currentIndex);
-      }
+    document.getElementById("fullscreenModal").addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
     });
+    document.getElementById("fullscreenModal").addEventListener("touchend", e => {
+      const endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) {
+        fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
+      } else if (endX - startX > 50) {
+        fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
+      }
+      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+    });
+
+    const car = JSON.parse(localStorage.getItem("car"));
+    const detail = document.getElementById("detail");
+
+    if (car) {
+      detail.innerHTML = `
+        <h2>${car.title}</h2>
+        <div class="images">
+          ${car.images.map((img, i) => `
+            <img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="display:${i === 0 ? 'block' : 'none'}" />
+          `).join("")}
+          <button class="arrow left" onclick="prevImage()">‹</button>
+          <button class="arrow right" onclick="nextImage()">›</button>
+        </div>
+        <div class="grid">
+          <div class="info-box"><strong>Precio:</strong> ${car.price}</div>
+          <div class="info-box"><strong>Modelo:</strong> ${car.model}</div>
+          <div class="info-box"><strong>Marca:</strong> ${car.brand}</div>
+          <div class="info-box"><strong>Transmisión:</strong> ${car.transmission}</div>
+          <div class="info-box"><strong>Combustible:</strong> ${car.fuel}</div>
+        </div>
+        <p>${car.description}</p>
+      `;
+      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+      startCarousel();
+    } else {
+      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
+    }
   </script>
 </body>
 </html>
