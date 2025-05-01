@@ -59,6 +59,12 @@
     <button onclick="window.location.href='index.html'">Regresar al menú</button>
   </div>
 
+  <!-- Modal de imagen -->
+  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;">
+    <img id="fullscreenImage" style="max-width:90%;max-height:80%;border-radius:8px;" />
+    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
+  </div>
+
   <script>
     let currentIndex = 0;
     let timer;
@@ -86,6 +92,17 @@
       timer = setInterval(nextImage, 5000);
     }
 
+    function openFullscreen(src) {
+      const modal = document.getElementById("fullscreenModal");
+      const img = document.getElementById("fullscreenImage");
+      img.src = src;
+      modal.style.display = "flex";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreenModal").style.display = "none";
+    }
+
     const car = JSON.parse(localStorage.getItem("car"));
     const detail = document.getElementById("detail");
 
@@ -99,7 +116,7 @@
         <p><strong>Combustible:</strong> ${car.fuel}</p>
         <p>${car.description}</p>
         <div style="position:relative;">
-          ${car.images.map((img, i) => `<img class="slide" src="${img}" alt="imagen" style="width:100%;max-height:300px;object-fit:contain;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />`).join("")}
+          ${car.images.map((img, i) => `<img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="width:100%;max-height:300px;object-fit:contain;cursor:pointer;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />`).join("")}
           <button onclick="prevImage()" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">‹</button>
           <button onclick="nextImage()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">›</button>
         </div>
