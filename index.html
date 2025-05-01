@@ -1,5 +1,3 @@
-Claro, aquí tienes el código completo del archivo index.html (para clientes), con el ajuste mínimo necesario para que el buscador filtre por título o marca sin alterar nada más de tu diseño o estructura:
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -55,21 +53,8 @@ Claro, aquí tienes el código completo del archivo index.html (para clientes), 
       border-radius: 5px;
       border: none;
     }
-    #search {
-      flex: 1;
-      background: #333;
-      color: white;
-    }
-    #brandFilter {
-      width: 40px;
-      background: #FFD700 url('https://img.icons8.com/ios-filled/24/000000/filter.png') no-repeat center;
-      background-size: 20px;
-      text-indent: -9999px;
-    }
-    #priceSort {
-      background: #333;
-      color: white;
-    }
+    #search { flex: 1; background: #333; color: white; }
+    #brandFilter, #priceSort { background: #333; color: white; }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -81,9 +66,9 @@ Claro, aquí tienes el código completo del archivo index.html (para clientes), 
   </header>
 
   <div class="filters">
-    <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
+    <input type="text" id="search" placeholder="Buscar vehículo por nombre o marca...">
     <select id="brandFilter" title="Filtrar por marca">
-      <option value="Todas" selected></option>
+      <option value="Todas" selected>Filtrar</option>
     </select>
     <select id="priceSort">
       <option value="default">Ordenar por precio</option>
@@ -147,7 +132,7 @@ Claro, aquí tienes el código completo del archivo index.html (para clientes), 
     function populateBrands(cars) {
       const brands = [...new Set(cars.map(doc => doc.data().brand?.trim()).filter(Boolean))];
       brands.sort();
-      brandFilter.innerHTML = '<option value="Todas" selected></option>';
+      brandFilter.innerHTML = '<option value="Todas" selected>Filtrar</option>';
       brands.forEach(b => {
         const option = document.createElement("option");
         option.value = b;
@@ -163,10 +148,14 @@ Claro, aquí tienes el código completo del archivo index.html (para clientes), 
 
       let filtered = allCars.filter(doc => {
         const car = doc.data();
-        const matchesBrand = selectedBrand === "Todas" || car.brand === selectedBrand;
+        const matchesBrand =
+          selectedBrand === "Todas" ||
+          (car.brand && car.brand.trim().toLowerCase() === selectedBrand.toLowerCase());
+
         const matchesText =
           car.title.toLowerCase().includes(text) ||
           (car.brand && car.brand.toLowerCase().includes(text));
+
         return matchesBrand && matchesText;
       });
 
@@ -193,6 +182,3 @@ Claro, aquí tienes el código completo del archivo index.html (para clientes), 
   </script>
 </body>
 </html>
-
-¿Quieres que también busque por modelo o por descripción además de marca y título? Puedo ayudarte con eso también.
-
