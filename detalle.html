@@ -2,130 +2,32 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Se actualizó esta línea ↓ para habilitar el zoom con los dedos -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
   <title>Detalle del Vehículo</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #121212;
-      color: white;
-      padding: 1rem;
-    }
-    h1, h2 {
-      color: #FFD700;
-    }
-    .container {
-      background: #1e1e1e;
-      padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #000;
-    }
-    .container p {
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
-    }
-    .actions {
-      margin-top: 1.5rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .actions a {
-      text-decoration: none;
-      padding: 0.8rem 1.2rem;
-      background: #25D366;
-      color: white;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-    .actions button {
-      background: #555;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.2rem;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    /* ... tu CSS original sin cambios ... */
   </style>
 </head>
 <body>
-  <h1>Detalle del Vehículo</h1>
-  <div class="container" id="detail"></div>
-  <div class="actions">
-    <a id="whatsapp" target="_blank">Contactar por WhatsApp</a>
-    <button onclick="window.location.href='index.html'">Regresar al menú</button>
+  <!-- ... contenido ... -->
+
+  <!-- Modal de imagen (cambiado solo estilo para permitir zoom) -->
+  <div id="fullscreenModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+       background:black; z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+    <!-- Imagen con propiedades de zoom táctil -->
+    <img id="fullscreenImage"
+         style="max-width:100%; max-height:100%;
+                object-fit:contain;
+                touch-action:manipulation;
+                transform-origin:center center;" />
+    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;
+            padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">
+      Cerrar
+    </button>
   </div>
 
-  <!-- Modal de imagen -->
-  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;overflow:hidden;">
-    <img id="fullscreenImage" style="max-width:100%;max-height:100%;touch-action:pan-y pinch-zoom;object-fit:contain;" />
-    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
-  </div>
-
-  <script>
-    let currentIndex = 0;
-    let timer;
-
-    function showImage(index) {
-      const slides = document.querySelectorAll(".slide");
-      slides.forEach((slide, i) => {
-        slide.style.display = i === index ? "block" : "none";
-      });
-    }
-
-    function nextImage() {
-      const slides = document.querySelectorAll(".slide");
-      currentIndex = (currentIndex + 1) % slides.length;
-      showImage(currentIndex);
-    }
-
-    function prevImage() {
-      const slides = document.querySelectorAll(".slide");
-      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-      showImage(currentIndex);
-    }
-
-    function startCarousel() {
-      timer = setInterval(nextImage, 5000);
-    }
-
-    function openFullscreen(src) {
-      const modal = document.getElementById("fullscreenModal");
-      const img = document.getElementById("fullscreenImage");
-      img.src = src;
-      modal.style.display = "flex";
-    }
-
-    function closeFullscreen() {
-      document.getElementById("fullscreenModal").style.display = "none";
-    }
-
-    const car = JSON.parse(localStorage.getItem("car"));
-    const detail = document.getElementById("detail");
-
-    if (car) {
-      detail.innerHTML = `
-        <h2>${car.title}</h2>
-        <p><strong>Precio:</strong> ${car.price}</p>
-        <p><strong>Modelo:</strong> ${car.model}</p>
-        <p><strong>Marca:</strong> ${car.brand}</p>
-        <p><strong>Transmisión:</strong> ${car.transmission}</p>
-        <p><strong>Combustible:</strong> ${car.fuel}</p>
-        <p>${car.description}</p>
-        <div style="position:relative;">
-          ${car.images.map((img, i) => `<img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="width:100%;max-height:300px;object-fit:contain;cursor:pointer;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />`).join("")}
-          <button onclick="prevImage()" style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">‹</button>
-          <button onclick="nextImage()" style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">›</button>
-        </div>
-      `;
-      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
-      startCarousel();
-    } else {
-      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
-    }
-  </script>
+  <!-- ... tu script y contenido final ... -->
 </body>
 </html>
