@@ -6,120 +6,129 @@
   <title>Detalle del Vehículo</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #121212;
-      color: white;
       margin: 0;
-      padding: 1rem;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
     }
-    .container {
-      background: #1e1e1e;
-      padding: 1rem;
-      border-radius: 8px;
+    .detalle-container {
+      padding: 20px;
     }
-    .slide {
-      width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-      border-radius: 6px;
-      display: none;
+    .detalle-container h2 {
+      margin-top: 0;
     }
-    .slide.active {
-      display: block;
+    .detalle-container img {
+      max-width: 100%;
+      margin: 10px 0;
+      cursor: zoom-in;
     }
-    .actions {
-      margin-top: 1rem;
+    .botones {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
     }
-    .actions a, .actions button {
-      background: #FFD700;
+    .botones a {
+      padding: 12px;
+      background-color: #ffd500;
       color: black;
-      padding: 0.6rem 1rem;
       border: none;
-      border-radius: 6px;
-      font-weight: bold;
       text-decoration: none;
-      margin-right: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      text-align: center;
+      flex: 1;
     }
-    #fullscreenModal {
+    .fullscreen {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: black;
       z-index: 9999;
-      display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
     }
-    #fullscreenImage {
-      max-height: 80%;
+    .fullscreen img {
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
+      touch-action: pan-y pinch-zoom;
+    }
+    .fullscreen button {
+      position: absolute;
+      bottom: 20px;
+      background-color: #ffd500;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
       border-radius: 6px;
     }
   </style>
 </head>
 <body>
-  <h1>Detalle del Vehículo</h1>
-  <div class="container" id="detail"></div>
-  <div class="actions">
-    <a id="whatsapp" target="_blank">Contactar por WhatsApp</a>
-    <button onclick="window.location.href='index.html'">Regresar al menú</button>
+  <div class="detalle-container">
+    <h2 id="titulo">Hyundai Elantra 2012</h2>
+    <p><strong>Precio:</strong> Q45,000</p>
+    <p><strong>Modelo:</strong> 2012</p>
+    <p><strong>Marca:</strong> Hyundai</p>
+    <p><strong>Transmisión:</strong> Automática</p>
+    <p><strong>Combustible:</strong> Gasolina</p>
+    <p>HYUNDAI ELANTRA 2012 AUTOMÁTICO TRIP TRONIC... hasta 48 visa cuotas.</p>
+
+    <div id="galeria">
+      <img src="https://i.postimg.cc/DZpPV2Bk/imagen1.jpg" onclick="verImagenCompleta(0)" />
+      <img src="https://i.postimg.cc/9Qf7RQFd/imagen2.jpg" onclick="verImagenCompleta(1)" />
+    </div>
+
+    <div class="botones">
+      <a href="https://wa.me/50253083929" target="_blank">Contactar por WhatsApp</a>
+      <a href="index.html">Regresar al menú</a>
+    </div>
   </div>
 
-  <!-- Modal pantalla completa -->
-  <div id="fullscreenModal">
-    <img id="fullscreenImage" />
-    <button onclick="closeFullscreen()" style="margin-top: 1rem;">Cerrar</button>
+  <div class="fullscreen" id="visor">
+    <img id="visorImagen" src="" />
+    <button onclick="cerrarVisor()">Cerrar</button>
   </div>
 
   <script>
-    const car = JSON.parse(localStorage.getItem("car"));
-    const detail = document.getElementById("detail");
+    const imagenes = [
+      "https://i.postimg.cc/DZpPV2Bk/imagen1.jpg",
+      "https://i.postimg.cc/9Qf7RQFd/imagen2.jpg"
+    ];
+    let imagenActual = 0;
 
-    let fullImages = [], fullIndex = 0;
-
-    if (car) {
-      detail.innerHTML = `
-        <h2>${car.title}</h2>
-        <p><strong>Precio:</strong> ${car.price}</p>
-        <p><strong>Modelo:</strong> ${car.model}</p>
-        <p><strong>Marca:</strong> ${car.brand}</p>
-        <p><strong>Transmisión:</strong> ${car.transmission}</p>
-        <p><strong>Combustible:</strong> ${car.fuel}</p>
-        <p>${car.description}</p>
-        ${car.images.map((img, i) => `
-          <img src="${img}" class="slide ${i === 0 ? 'active' : ''}" onclick="openFullscreenFromGallery(${i})" />
-        `).join("")}
-      `;
-      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+    function verImagenCompleta(indice) {
+      imagenActual = indice;
+      document.getElementById("visorImagen").src = imagenes[indice];
+      document.getElementById("visor").style.display = "flex";
     }
 
-    function openFullscreenFromGallery(index) {
-      fullImages = Array.from(document.querySelectorAll(".slide")).map(i => i.src);
-      fullIndex = index;
-      document.getElementById("fullscreenImage").src = fullImages[fullIndex];
-      document.getElementById("fullscreenModal").style.display = "flex";
+    function cerrarVisor() {
+      document.getElementById("visor").style.display = "none";
     }
 
-    function closeFullscreen() {
-      document.getElementById("fullscreenModal").style.display = "none";
-    }
-
-    // Swipe táctil en el modal
+    // Deslizar con el dedo
     let startX = 0;
-    document.getElementById("fullscreenModal").addEventListener("touchstart", e => {
+    document.getElementById("visor").addEventListener("touchstart", function(e) {
       startX = e.touches[0].clientX;
     });
-    document.getElementById("fullscreenModal").addEventListener("touchend", e => {
+
+    document.getElementById("visor").addEventListener("touchend", function(e) {
       const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) {
-        fullIndex = (fullIndex + 1) % fullImages.length;
-      } else if (endX - startX > 50) {
-        fullIndex = (fullIndex - 1 + fullImages.length) % fullImages.length;
-      } else return;
-      document.getElementById("fullscreenImage").src = fullImages[fullIndex];
+      if (startX - endX > 50) avanzar();
+      else if (endX - startX > 50) retroceder();
     });
+
+    function avanzar() {
+      imagenActual = (imagenActual + 1) % imagenes.length;
+      document.getElementById("visorImagen").src = imagenes[imagenActual];
+    }
+
+    function retroceder() {
+      imagenActual = (imagenActual - 1 + imagenes.length) % imagenes.length;
+      document.getElementById("visorImagen").src = imagenes[imagenActual];
+    }
   </script>
 </body>
 </html>
