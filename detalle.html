@@ -79,27 +79,31 @@
     #prevBtn { left: 10px; }
     #nextBtn { right: 10px; }
 
-    #whatsapp {
+    #whatsapp-icon {
       position: fixed;
-      top: 10px;
-      right: 15px;
-      background: #25D366;
-      color: white;
-      padding: 0.7rem 1.2rem;
-      font-weight: bold;
-      border-radius: 40px;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      top: 12px;
+      right: 12px;
       z-index: 1000;
     }
+    #whatsapp-icon img {
+      width: 45px;
+      height: 45px;
+      background: #25D366;
+      padding: 6px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
 
-    #fullscreenModal #whatsapp {
+    #fullscreenModal #whatsapp-icon {
       display: none !important;
     }
   </style>
 </head>
 <body>
-  <a id="whatsapp" target="_blank">Cotizar por WhatsApp</a>
+  <a id="whatsapp-icon" target="_blank">
+    <img src="https://img.icons8.com/ios-filled/50/FFFFFF/whatsapp--v1.png" alt="WhatsApp" />
+  </a>
+
   <h1>Detalle del Vehículo</h1>
   <div class="container" id="detail"></div>
 
@@ -149,12 +153,12 @@
       fullscreenIndex = fullscreenImages.indexOf(src);
       img.src = src;
       modal.style.display = "flex";
-      document.getElementById("whatsapp").style.display = "none";
+      document.getElementById("whatsapp-icon").style.display = "none";
     }
 
     function closeFullscreen() {
       document.getElementById("fullscreenModal").style.display = "none";
-      document.getElementById("whatsapp").style.display = "block";
+      document.getElementById("whatsapp-icon").style.display = "block";
     }
 
     let startX = 0;
@@ -189,7 +193,7 @@
         </div>
         <p>${car.description}</p>
       `;
-      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+      document.getElementById("whatsapp-icon").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
       showImage(0);
       startCarousel();
     } else {
