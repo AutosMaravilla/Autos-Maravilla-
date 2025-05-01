@@ -21,13 +21,6 @@
       border-radius: 10px;
       box-shadow: 0 0 10px #000;
     }
-    .container img {
-      width: 100%;
-      margin-bottom: 1rem;
-      max-height: 300px;
-      object-fit: contain;
-      border-radius: 6px;
-    }
     .container p {
       word-wrap: break-word;
       overflow-wrap: break-word;
@@ -67,6 +60,32 @@
   </div>
 
   <script>
+    let currentIndex = 0;
+    let timer;
+
+    function showImage(index) {
+      const slides = document.querySelectorAll(".slide");
+      slides.forEach((slide, i) => {
+        slide.style.display = i === index ? "block" : "none";
+      });
+    }
+
+    function nextImage() {
+      const slides = document.querySelectorAll(".slide");
+      currentIndex = (currentIndex + 1) % slides.length;
+      showImage(currentIndex);
+    }
+
+    function prevImage() {
+      const slides = document.querySelectorAll(".slide");
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showImage(currentIndex);
+    }
+
+    function startCarousel() {
+      timer = setInterval(nextImage, 5000);
+    }
+
     const car = JSON.parse(localStorage.getItem("car"));
     const detail = document.getElementById("detail");
 
@@ -79,9 +98,14 @@
         <p><strong>Transmisión:</strong> ${car.transmission}</p>
         <p><strong>Combustible:</strong> ${car.fuel}</p>
         <p>${car.description}</p>
-        ${car.images.map(img => `<img src="${img}" alt="imagen del vehículo">`).join("")}
+        <div style="position:relative;">
+          ${car.images.map((img, i) => `<img class="slide" src="${img}" alt="imagen" style="width:100%;max-height:300px;object-fit:contain;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />`).join("")}
+          <button onclick="prevImage()" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">‹</button>
+          <button onclick="nextImage()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">›</button>
+        </div>
       `;
       document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+      startCarousel();
     } else {
       detail.innerHTML = "<p>No se encontró el vehículo.</p>";
     }
