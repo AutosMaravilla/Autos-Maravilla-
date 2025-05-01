@@ -16,7 +16,6 @@
     h1, h2 {
       color: #FFD700;
       text-align: center;
-      margin-top: 0;
     }
     .container {
       background: #1e1e1e;
@@ -121,12 +120,10 @@
   </style>
 </head>
 <body>
-  <!-- Botón WhatsApp flotante -->
   <a id="whatsapp" target="_blank">
     <img src="https://img.icons8.com/ios-filled/50/ffffff/whatsapp--v1.png" alt="WhatsApp" />
   </a>
 
-  <!-- Botón de regresar -->
   <a id="back-button" href="index.html" title="Regresar al menú">
     <img src="https://img.icons8.com/ios-filled/50/000000/left.png" alt="Regresar" />
   </a>
@@ -134,11 +131,10 @@
   <h1>Detalle del Vehículo</h1>
   <div class="container" id="detail"></div>
 
-  <!-- Modal pantalla completa -->
   <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;">
-    <button class="arrow left" onclick="prevImage()">‹</button>
+    <button class="arrow left" onclick="prevFullscreen()">‹</button>
     <img id="fullscreenImage" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;touch-action:manipulation;" />
-    <button class="arrow right" onclick="nextImage()">›</button>
+    <button class="arrow right" onclick="nextFullscreen()">›</button>
     <button onclick="closeFullscreen()" style="position:absolute;bottom:20px;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
   </div>
 
@@ -180,6 +176,16 @@
       modal.style.display = "flex";
     }
 
+    function nextFullscreen() {
+      fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
+      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+    }
+
+    function prevFullscreen() {
+      fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
+      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+    }
+
     function closeFullscreen() {
       document.getElementById("fullscreenModal").style.display = "none";
     }
@@ -190,12 +196,8 @@
     });
     document.getElementById("fullscreenModal").addEventListener("touchend", e => {
       const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) {
-        fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
-      } else if (endX - startX > 50) {
-        fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
-      }
-      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+      if (startX - endX > 50) nextFullscreen();
+      else if (endX - startX > 50) prevFullscreen();
     });
 
     const car = JSON.parse(localStorage.getItem("car"));
