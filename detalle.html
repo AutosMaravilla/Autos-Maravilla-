@@ -11,113 +11,95 @@
       background: #121212;
       color: white;
       padding: 1rem;
+      margin: 0;
     }
     h1, h2 {
       color: #FFD700;
+      margin-top: 0;
     }
     .container {
       background: #1e1e1e;
       padding: 1.5rem;
       border-radius: 10px;
-      box-shadow: 0 0 10px #000;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+      max-width: 900px;
+      margin: auto;
     }
     .container p {
+      font-size: 1rem;
+      line-height: 1.6;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
       white-space: pre-wrap;
     }
-    .info-columns {
+    .grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 2rem;
+      gap: 1rem;
       justify-content: space-between;
-      margin-top: 1rem;
-      margin-bottom: 1.5rem;
     }
-    .info-columns > div {
+    .info-box {
       flex: 1 1 45%;
+      background-color: #1a1a1a;
+      padding: 1rem;
+      border-radius: 6px;
+    }
+    .info-box strong {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 1.1rem;
+    }
+    .images {
+      position: relative;
+      margin: 1rem 0;
+    }
+    .images img {
+      width: 100%;
+      max-height: 400px;
+      object-fit: contain;
+      border-radius: 10px;
     }
     .actions {
-      margin-top: 3rem;
+      margin-top: 1.5rem;
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
     }
-    .actions button {
-      background: #555;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.2rem;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .slide {
-      width: 100%;
-      max-height: 400px;
-      object-fit: contain;
-      cursor: pointer;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-    .arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0,0,0,0.4);
-      color: white;
-      font-size: 2rem;
-      padding: 0.3rem 1rem;
-      border: none;
-      cursor: pointer;
-      border-radius: 6px;
-      display: none;
-    }
-    @media (min-width: 768px) {
-      .arrow {
-        display: block;
-      }
-    }
-    #prevBtn { left: 10px; }
-    #nextBtn { right: 10px; }
-
-    #whatsapp-icon {
+    .whatsapp-float {
       position: fixed;
-      top: 12px;
-      right: 12px;
-      z-index: 1000;
-    }
-    #whatsapp-icon img {
-      width: 45px;
-      height: 45px;
+      top: 1rem;
+      right: 1rem;
       background: #25D366;
-      padding: 6px;
       border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      width: 55px;
+      height: 55px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 10px #000;
+      z-index: 9999;
     }
-
-    #fullscreenModal #whatsapp-icon {
-      display: none !important;
+    .whatsapp-float img {
+      width: 30px;
+      height: 30px;
+    }
+    @media (max-width: 600px) {
+      .grid {
+        flex-direction: row;
+      }
+      .info-box {
+        flex: 1 1 45%;
+      }
     }
   </style>
 </head>
 <body>
-  <a id="whatsapp-icon" target="_blank">
-    <img src="https://img.icons8.com/ios-filled/50/FFFFFF/whatsapp--v1.png" alt="WhatsApp" />
+  <a id="whatsapp" class="whatsapp-float" target="_blank">
+    <img src="https://img.icons8.com/ios-filled/50/ffffff/whatsapp.png" alt="WhatsApp">
   </a>
 
-  <h1>Detalle del Vehículo</h1>
+  <h1 style="text-align:center;">Detalle del Vehículo</h1>
   <div class="container" id="detail"></div>
-
-  <!-- Modal de imagen -->
-  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;">
-    <button class="arrow" id="prevBtn" onclick="prevImage()">‹</button>
-    <img id="fullscreenImage" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;" />
-    <button class="arrow" id="nextBtn" onclick="nextImage()">›</button>
-    <button onclick="closeFullscreen()" style="position:absolute;bottom:20px;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
-  </div>
-
-  <div class="actions">
-    <button onclick="window.location.href='index.html'">Regresar al menú</button>
-  </div>
 
   <script>
     let currentIndex = 0;
@@ -125,6 +107,32 @@
     let fullscreenImages = [];
     let fullscreenIndex = 0;
 
+    const car = JSON.parse(localStorage.getItem("car"));
+    const detail = document.getElementById("detail");
+
+    if (car) {
+      detail.innerHTML = `
+        <h2>${car.title}</h2>
+        <div class="images">
+          ${car.images.map((img, i) => `
+            <img class="slide" src="${img}" alt="imagen" style="display:${i === 0 ? 'block' : 'none'}" />
+          `).join("")}
+        </div>
+        <div class="grid">
+          <div class="info-box"><strong>Precio:</strong>${car.price}</div>
+          <div class="info-box"><strong>Modelo:</strong>${car.model}</div>
+          <div class="info-box"><strong>Marca:</strong>${car.brand}</div>
+          <div class="info-box"><strong>Transmisión:</strong>${car.transmission}</div>
+          <div class="info-box"><strong>Combustible:</strong>${car.fuel}</div>
+        </div>
+        <p>${car.description}</p>
+      `;
+      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+    } else {
+      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
+    }
+
+    // Carrusel auto y táctil
     function showImage(index) {
       const slides = document.querySelectorAll(".slide");
       slides.forEach((slide, i) => {
@@ -133,72 +141,26 @@
     }
 
     function nextImage() {
-      fullscreenIndex = (fullscreenIndex + 1) % fullscreenImages.length;
-      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
+      const slides = document.querySelectorAll(".slide");
+      currentIndex = (currentIndex + 1) % slides.length;
+      showImage(currentIndex);
     }
 
-    function prevImage() {
-      fullscreenIndex = (fullscreenIndex - 1 + fullscreenImages.length) % fullscreenImages.length;
-      document.getElementById("fullscreenImage").src = fullscreenImages[fullscreenIndex];
-    }
+    timer = setInterval(nextImage, 5000);
 
-    function startCarousel() {
-      timer = setInterval(nextImage, 5000);
-    }
-
-    function openFullscreen(src) {
-      const modal = document.getElementById("fullscreenModal");
-      const img = document.getElementById("fullscreenImage");
-      fullscreenImages = Array.from(document.querySelectorAll(".slide")).map(i => i.src);
-      fullscreenIndex = fullscreenImages.indexOf(src);
-      img.src = src;
-      modal.style.display = "flex";
-      document.getElementById("whatsapp-icon").style.display = "none";
-    }
-
-    function closeFullscreen() {
-      document.getElementById("fullscreenModal").style.display = "none";
-      document.getElementById("whatsapp-icon").style.display = "block";
-    }
-
+    const modal = document.createElement('div');
     let startX = 0;
-    document.getElementById("fullscreenModal").addEventListener("touchstart", (e) => {
-      startX = e.touches[0].clientX;
-    });
-    document.getElementById("fullscreenModal").addEventListener("touchend", (e) => {
+    document.body.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    document.body.addEventListener("touchend", e => {
       const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) nextImage();
-      else if (endX - startX > 50) prevImage();
+      if (endX - startX > 50) {
+        currentIndex = (currentIndex - 1 + car.images.length) % car.images.length;
+        showImage(currentIndex);
+      } else if (startX - endX > 50) {
+        currentIndex = (currentIndex + 1) % car.images.length;
+        showImage(currentIndex);
+      }
     });
-
-    const car = JSON.parse(localStorage.getItem("car"));
-    const detail = document.getElementById("detail");
-
-    if (car) {
-      detail.innerHTML = `
-        <h2>${car.title}</h2>
-        <div style="position:relative;">
-          ${car.images.map((img, i) => `
-            <img class="slide" src="${img}" alt="imagen"
-              onclick="openFullscreen(this.src)"
-              style="display:${i === 0 ? 'block' : 'none'};" />
-          `).join("")}
-        </div>
-        <div class="info-columns">
-          <div><p><strong>Precio:</strong><br>${car.price}</p></div>
-          <div><p><strong>Modelo:</strong><br>${car.model}</p></div>
-          <div><p><strong>Marca:</strong><br>${car.brand}</p></div>
-          <div><p><strong>Transmisión:</strong><br>${car.transmission}</p></div>
-          <div><p><strong>Combustible:</strong><br>${car.fuel}</p></div>
-        </div>
-        <p>${car.description}</p>
-      `;
-      document.getElementById("whatsapp-icon").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
-      showImage(0);
-      startCarousel();
-    } else {
-      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
-    }
   </script>
 </body>
 </html>
