@@ -4,130 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Detalle del Vehículo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
   <style>
     body {
-      margin: 0;
-      background: #111;
+      font-family: 'Roboto', sans-serif;
+      background: #121212;
       color: white;
-      font-family: Arial, sans-serif;
+      padding: 1rem;
     }
-    .detalle-container {
-      padding: 20px;
+    h1, h2 {
+      color: #FFD700;
     }
-    .detalle-container h2 {
-      margin-top: 0;
+    .container {
+      background: #1e1e1e;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
     }
-    .detalle-container img {
-      max-width: 100%;
-      margin: 10px 0;
-      cursor: zoom-in;
+    .container p {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
-    .botones {
+    .actions {
+      margin-top: 1.5rem;
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
-    .botones a {
-      padding: 12px;
-      background-color: #ffd500;
-      color: black;
-      border: none;
+    .actions a {
       text-decoration: none;
-      font-weight: bold;
+      padding: 0.8rem 1.2rem;
+      background: #25D366;
+      color: white;
       border-radius: 6px;
-      text-align: center;
-      flex: 1;
+      font-weight: bold;
     }
-    .fullscreen {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: black;
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-    .fullscreen img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      touch-action: pan-y pinch-zoom;
-    }
-    .fullscreen button {
-      position: absolute;
-      bottom: 20px;
-      background-color: #ffd500;
-      color: black;
+    .actions button {
+      background: #555;
+      color: white;
       border: none;
-      padding: 10px 20px;
-      font-weight: bold;
+      padding: 0.8rem 1.2rem;
       border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="detalle-container">
-    <h2 id="titulo">Hyundai Elantra 2012</h2>
-    <p><strong>Precio:</strong> Q45,000</p>
-    <p><strong>Modelo:</strong> 2012</p>
-    <p><strong>Marca:</strong> Hyundai</p>
-    <p><strong>Transmisión:</strong> Automática</p>
-    <p><strong>Combustible:</strong> Gasolina</p>
-    <p>HYUNDAI ELANTRA 2012 AUTOMÁTICO TRIP TRONIC... hasta 48 visa cuotas.</p>
-
-    <div id="galeria">
-      <img src="https://i.postimg.cc/DZpPV2Bk/imagen1.jpg" onclick="verImagenCompleta(0)" />
-      <img src="https://i.postimg.cc/9Qf7RQFd/imagen2.jpg" onclick="verImagenCompleta(1)" />
-    </div>
-
-    <div class="botones">
-      <a href="https://wa.me/50253083929" target="_blank">Contactar por WhatsApp</a>
-      <a href="index.html">Regresar al menú</a>
-    </div>
+  <h1>Detalle del Vehículo</h1>
+  <div class="container" id="detail"></div>
+  <div class="actions">
+    <a id="whatsapp" target="_blank">Contactar por WhatsApp</a>
+    <button onclick="window.location.href='index.html'">Regresar al menú</button>
   </div>
 
-  <div class="fullscreen" id="visor">
-    <img id="visorImagen" src="" />
-    <button onclick="cerrarVisor()">Cerrar</button>
+  <!-- Modal de imagen -->
+  <div id="fullscreenModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;justify-content:center;align-items:center;flex-direction:column;overflow:hidden;">
+    <img id="fullscreenImage" style="max-width:100%;max-height:100%;touch-action:pan-y pinch-zoom;object-fit:contain;" />
+    <button onclick="closeFullscreen()" style="margin-top:1rem;background:#FFD700;color:black;padding:0.5rem 1rem;border:none;border-radius:6px;font-weight:bold;">Cerrar</button>
   </div>
 
   <script>
-    const imagenes = [
-      "https://i.postimg.cc/DZpPV2Bk/imagen1.jpg",
-      "https://i.postimg.cc/9Qf7RQFd/imagen2.jpg"
-    ];
-    let imagenActual = 0;
+    let currentIndex = 0;
+    let timer;
 
-    function verImagenCompleta(indice) {
-      imagenActual = indice;
-      document.getElementById("visorImagen").src = imagenes[indice];
-      document.getElementById("visor").style.display = "flex";
+    function showImage(index) {
+      const slides = document.querySelectorAll(".slide");
+      slides.forEach((slide, i) => {
+        slide.style.display = i === index ? "block" : "none";
+      });
     }
 
-    function cerrarVisor() {
-      document.getElementById("visor").style.display = "none";
+    function nextImage() {
+      const slides = document.querySelectorAll(".slide");
+      currentIndex = (currentIndex + 1) % slides.length;
+      showImage(currentIndex);
     }
 
-    // Deslizar con el dedo
-    let startX = 0;
-    document.getElementById("visor").addEventListener("touchstart", function(e) {
-      startX = e.touches[0].clientX;
-    });
-
-    document.getElementById("visor").addEventListener("touchend", function(e) {
-      const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) avanzar();
-      else if (endX - startX > 50) retroceder();
-    });
-
-    function avanzar() {
-      imagenActual = (imagenActual + 1) % imagenes.length;
-      document.getElementById("visorImagen").src = imagenes[imagenActual];
+    function prevImage() {
+      const slides = document.querySelectorAll(".slide");
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showImage(currentIndex);
     }
 
-    function retroceder() {
-      imagenActual = (imagenActual - 1 + imagenes.length) % imagenes.length;
-      document.getElementById("visorImagen").src = imagenes[imagenActual];
+    function startCarousel() {
+      timer = setInterval(nextImage, 5000);
+    }
+
+    function openFullscreen(src) {
+      const modal = document.getElementById("fullscreenModal");
+      const img = document.getElementById("fullscreenImage");
+      img.src = src;
+      modal.style.display = "flex";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreenModal").style.display = "none";
+    }
+
+    const car = JSON.parse(localStorage.getItem("car"));
+    const detail = document.getElementById("detail");
+
+    if (car) {
+      detail.innerHTML = `
+        <h2>${car.title}</h2>
+        <p><strong>Precio:</strong> ${car.price}</p>
+        <p><strong>Modelo:</strong> ${car.model}</p>
+        <p><strong>Marca:</strong> ${car.brand}</p>
+        <p><strong>Transmisión:</strong> ${car.transmission}</p>
+        <p><strong>Combustible:</strong> ${car.fuel}</p>
+        <p>${car.description}</p>
+        <div style="position:relative;">
+          ${car.images.map((img, i) => `<img class="slide" src="${img}" alt="imagen" onclick="openFullscreen(this.src)" style="width:100%;max-height:300px;object-fit:contain;cursor:pointer;display:${i === 0 ? 'block' : 'none'};border-radius:6px;" />`).join("")}
+          <button onclick="prevImage()" style="position:absolute;left:-10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">‹</button>
+          <button onclick="nextImage()" style="position:absolute;right:-10px;top:50%;transform:translateY(-50%);background:#FFD700;color:black;border:none;padding:0.5rem;border-radius:4px;">›</button>
+        </div>
+      `;
+      document.getElementById("whatsapp").href = `https://wa.me/50253083929?text=Hola,%20estoy%20interesado%20en%20el%20vehículo:%20${encodeURIComponent(car.title)}`;
+      startCarousel();
+    } else {
+      detail.innerHTML = "<p>No se encontró el vehículo.</p>";
     }
   </script>
 </body>
