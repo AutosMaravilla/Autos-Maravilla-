@@ -17,7 +17,6 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       cursor: pointer;
-      position: relative;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .car:hover {
@@ -68,17 +67,6 @@
     #priceSort {
       background: #333;
       color: white;
-    }
-    .sold-badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: red;
-      color: white;
-      padding: 4px 8px;
-      font-weight: bold;
-      border-radius: 6px;
-      font-size: 0.9rem;
     }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -142,8 +130,10 @@
         const div = document.createElement("div");
         div.className = "car";
         div.innerHTML = `
-          ${car.sold ? '<div class="sold-badge">VENDIDO</div>' : ''}
-          <img src="${car.images[0]}" alt="imagen del vehículo">
+          <div style="position:relative;">
+            <img src="${car.images[0]}" alt="imagen del vehículo">
+            ${car.vendido ? '<div style="position:absolute;top:10px;left:10px;background:red;color:white;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:0.9rem;">VENDIDO</div>' : ''}
+          </div>
           <h2>${car.title}</h2>
           <p><strong>Precio:</strong> ${car.price}</p>
         `;
