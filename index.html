@@ -10,9 +10,6 @@
     header { display: flex; align-items: center; margin-bottom: 2rem; }
     header img { height: 50px; margin-right: 1rem; border-radius: 6px; }
     h1 { color: #FFD700; }
-
-    h2 { color: #FFD700; margin-top: 2rem; }
-
     .car {
       background: #1e1e1e;
       padding: 1rem;
@@ -20,8 +17,8 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       cursor: pointer;
-      position: relative;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
     }
     .car:hover {
       transform: scale(1.015);
@@ -33,18 +30,6 @@
       object-fit: cover;
       border-radius: 8px;
       margin-bottom: 0.5rem;
-    }
-    .vendido-label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(255, 0, 0, 0.8);
-      color: white;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-      font-weight: bold;
-      border-radius: 6px;
-      z-index: 1;
     }
     .car h2 {
       color: #FFD700;
@@ -84,6 +69,17 @@
       background: #333;
       color: white;
     }
+    .vendido-label {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: red;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -106,11 +102,7 @@
     </select>
   </div>
 
-  <h2>Vehículos Disponibles</h2>
   <div id="catalog"></div>
-
-  <h2>Vehículos Vendidos</h2>
-  <div id="vendidos"></div>
 
   <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
     <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
@@ -137,16 +129,19 @@
     const db = firebase.firestore();
 
     const catalog = document.getElementById("catalog");
-    const vendidos = document.getElementById("vendidos");
     const searchInput = document.getElementById("search");
     const brandFilter = document.getElementById("brandFilter");
     const priceSort = document.getElementById("priceSort");
 
     let allCars = [];
 
-    function renderCars(list, container) {
-      container.innerHTML = "";
-      list.forEach(doc => {
+    function normalize(text) {
+      return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+    }
+
+    function render(cars) {
+      catalog.innerHTML = "";
+      cars.forEach(doc => {
         const car = doc.data();
         const div = document.createElement("div");
         div.className = "car";
@@ -160,7 +155,7 @@
           localStorage.setItem("car", JSON.stringify(car));
           window.location.href = "detalle.html";
         };
-        container.appendChild(div);
+        catalog.appendChild(div);
       });
     }
 
@@ -177,34 +172,32 @@
     }
 
     function applyFilters() {
-      const text = searchInput.value.toLowerCase();
+      const text = normalize(searchInput.value);
       const selectedBrand = brandFilter.value;
       const sort = priceSort.value;
 
       let filtered = allCars.filter(doc => {
         const car = doc.data();
-        const matchesBrand = selectedBrand === "Todas" || car.brand === selectedBrand;
-        const matchesText = car.title.toLowerCase().includes(text);
+        const matchesBrand = selectedBrand === "Todas" || normalize(car.brand) === normalize(selectedBrand);
+        const matchesText = normalize(car.title).includes(text);
         return matchesBrand && matchesText;
       });
 
-      const disponibles = filtered.filter(doc => !doc.data().vendido);
-      const vendidosList = filtered.filter(doc => doc.data().vendido);
-
       if (sort !== "default") {
-        const getPrice = doc => parseFloat(doc.data().price.replace(/[^\d.]/g, ""));
-        disponibles.sort((a, b) => sort === "asc" ? getPrice(a) - getPrice(b) : getPrice(b) - getPrice(a));
-        vendidosList.sort((a, b) => sort === "asc" ? getPrice(a) - getPrice(b) : getPrice(b) - getPrice(a));
+        filtered.sort((a, b) => {
+          const priceA = parseFloat(a.data().price.replace(/[^\d.]/g, ""));
+          const priceB = parseFloat(b.data().price.replace(/[^\d.]/g, ""));
+          return sort === "asc" ? priceA - priceB : priceB - priceA;
+        });
       }
 
-      renderCars(disponibles, catalog);
-      renderCars(vendidosList, vendidos);
+      render(filtered);
     }
 
     db.collection("vehiculos").onSnapshot(snapshot => {
       allCars = snapshot.docs;
+      render(allCars);
       populateBrands(allCars);
-      applyFilters();
     });
 
     searchInput.addEventListener("input", applyFilters);
