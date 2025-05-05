@@ -1,3 +1,5 @@
+Aquí tienes el código completo actualizado de tu página de clientes (index.html) con el indicador “VENDIDO” visible sobre la imagen del carro si ha sido marcado como tal en el panel de administración:
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,25 +8,10 @@
   <title>Autos Maravilla</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #121212;
-      color: white;
-      padding: 1rem;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    header img {
-      height: 50px;
-      margin-right: 1rem;
-      border-radius: 6px;
-    }
-    h1 {
-      color: #FFD700;
-    }
+    body { font-family: 'Roboto', sans-serif; background: #121212; color: white; padding: 1rem; }
+    header { display: flex; align-items: center; margin-bottom: 2rem; }
+    header img { height: 50px; margin-right: 1rem; border-radius: 6px; }
+    h1 { color: #FFD700; }
     .car {
       background: #1e1e1e;
       padding: 1rem;
@@ -74,13 +61,10 @@
       color: white;
     }
     #brandFilter {
-      width: 44px;
+      width: 40px;
       background: #FFD700 url('https://img.icons8.com/ios-filled/24/000000/filter.png') no-repeat center;
       background-size: 20px;
-      color: transparent;
       text-indent: -9999px;
-      border-radius: 6px;
-      padding: 0;
     }
     #priceSort {
       background: #333;
@@ -97,9 +81,9 @@
   </header>
 
   <div class="filters">
-    <input type="text" id="search" placeholder="Buscar vehículo por nombre o marca...">
+    <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
     <select id="brandFilter" title="Filtrar por marca">
-      <option value="Todas" selected>Filtrar</option>
+      <option value="Todas" selected></option>
     </select>
     <select id="priceSort">
       <option value="default">Ordenar por precio</option>
@@ -110,9 +94,8 @@
 
   <div id="catalog"></div>
 
-  <!-- Botones flotantes -->
   <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
-    <a href="https://wa.me/50247250332" target="_blank" style="display:block;margin-bottom:10px;">
+    <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
       <img src="https://img.icons8.com/ios-filled/50/FFD700/whatsapp--v1.png"
            style="width:45px;height:45px;background:black;padding:6px;border-radius:50%;" />
     </a>
@@ -149,7 +132,10 @@
         const div = document.createElement("div");
         div.className = "car";
         div.innerHTML = `
-          <img src="${car.images[0]}" alt="imagen del vehículo">
+          <div style="position: relative;">
+            ${car.sold ? '<div style="position:absolute;top:10px;left:10px;background:red;color:white;padding:4px 8px;font-weight:bold;border-radius:4px;">VENDIDO</div>' : ''}
+            <img src="${car.images[0]}" alt="imagen del vehículo">
+          </div>
           <h2>${car.title}</h2>
           <p><strong>Precio:</strong> ${car.price}</p>
         `;
@@ -162,13 +148,13 @@
     }
 
     function populateBrands(cars) {
-      const brands = [...new Set(cars.map(doc => doc.data().brand?.trim().toLowerCase()).filter(Boolean))];
+      const brands = [...new Set(cars.map(doc => doc.data().brand?.trim()).filter(Boolean))];
       brands.sort();
-      brandFilter.innerHTML = '<option value="Todas" selected>Filtrar</option>';
+      brandFilter.innerHTML = '<option value="Todas" selected></option>';
       brands.forEach(b => {
         const option = document.createElement("option");
         option.value = b;
-        option.textContent = b.charAt(0).toUpperCase() + b.slice(1);
+        option.textContent = b;
         brandFilter.appendChild(option);
       });
     }
@@ -180,9 +166,8 @@
 
       let filtered = allCars.filter(doc => {
         const car = doc.data();
-        const brand = car.brand?.trim().toLowerCase() || "";
-        const matchesBrand = selectedBrand === "Todas" || brand === selectedBrand;
-        const matchesText = car.title.toLowerCase().includes(text) || brand.includes(text);
+        const matchesBrand = selectedBrand === "Todas" || car.brand === selectedBrand;
+        const matchesText = car.title.toLowerCase().includes(text);
         return matchesBrand && matchesText;
       });
 
@@ -209,3 +194,6 @@
   </script>
 </body>
 </html>
+
+¿Quieres que también te lo dé como archivo descargable o necesitas otra modificación adicional?
+
