@@ -6,10 +6,25 @@
   <title>Autos Maravilla</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Roboto', sans-serif; background: #121212; color: white; padding: 1rem; }
-    header { display: flex; align-items: center; margin-bottom: 2rem; }
-    header img { height: 50px; margin-right: 1rem; border-radius: 6px; }
-    h1 { color: #FFD700; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #121212;
+      color: white;
+      padding: 1rem;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    header img {
+      height: 50px;
+      margin-right: 1rem;
+      border-radius: 6px;
+    }
+    h1 {
+      color: #FFD700;
+    }
     .car {
       background: #1e1e1e;
       padding: 1rem;
@@ -19,9 +34,21 @@
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .car:hover {
-      transform: scale(1.015);
-      box-shadow: 0 6px 18px rgba(255, 215, 0, 0.2);
+    .car.vendido {
+      opacity: 0.6;
+      position: relative;
+    }
+    .car.vendido::before {
+      content: 'VENDIDO';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: red;
+      color: white;
+      padding: 4px 8px;
+      font-weight: bold;
+      border-radius: 4px;
+      z-index: 1;
     }
     .car img {
       width: 100%;
@@ -68,6 +95,19 @@
       background: #333;
       color: white;
     }
+    #vendidos {
+      margin-top: 2rem;
+    }
+    #toggleVendidosBtn {
+      margin-bottom: 1rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #FFD700;
+      color: black;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -91,6 +131,10 @@
   </div>
 
   <div id="catalog"></div>
+
+  <h2 style="margin-top:2rem;">Vehículos Vendidos</h2>
+  <button id="toggleVendidosBtn" onclick="toggleVendidos()">Mostrar/Ocultar Vendidos</button>
+  <div id="vendidos" style="display: block;"></div>
 
   <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
     <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
@@ -117,6 +161,7 @@
     const db = firebase.firestore();
 
     const catalog = document.getElementById("catalog");
+    const vendidosContainer = document.getElementById("vendidos");
     const searchInput = document.getElementById("search");
     const brandFilter = document.getElementById("brandFilter");
     const priceSort = document.getElementById("priceSort");
@@ -125,15 +170,14 @@
 
     function render(cars) {
       catalog.innerHTML = "";
+      vendidosContainer.innerHTML = "";
+
       cars.forEach(doc => {
         const car = doc.data();
         const div = document.createElement("div");
-        div.className = "car";
+        div.className = "car" + (car.sold ? " vendido" : "");
         div.innerHTML = `
-          <div style="position:relative;">
-            <img src="${car.images[0]}" alt="imagen del vehículo">
-            ${car.vendido ? '<div style="position:absolute;top:10px;left:10px;background:red;color:white;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:0.9rem;">VENDIDO</div>' : ''}
-          </div>
+          <img src="${car.images[0]}" alt="imagen del vehículo">
           <h2>${car.title}</h2>
           <p><strong>Precio:</strong> ${car.price}</p>
         `;
@@ -141,7 +185,11 @@
           localStorage.setItem("car", JSON.stringify(car));
           window.location.href = "detalle.html";
         };
-        catalog.appendChild(div);
+        if (car.sold) {
+          vendidosContainer.appendChild(div);
+        } else {
+          catalog.appendChild(div);
+        }
       });
     }
 
@@ -178,6 +226,11 @@
       }
 
       render(filtered);
+    }
+
+    function toggleVendidos() {
+      const section = document.getElementById("vendidos");
+      section.style.display = section.style.display === "none" ? "block" : "none";
     }
 
     db.collection("vehiculos").onSnapshot(snapshot => {
