@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,39 @@
     header { display: flex; align-items: center; margin-bottom: 2rem; }
     header img { height: 50px; margin-right: 1rem; border-radius: 6px; }
     h1, h2 { color: #FFD700; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filters input, .filters select {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+    }
+
+    #search {
+      flex: 1;
+      background: #333;
+      color: white;
+    }
+
+    #brandFilter {
+      width: 40px;
+      background: #FFD700 url('https://img.icons8.com/ios-filled/24/000000/filter.png') no-repeat center;
+      background-size: 20px;
+      text-indent: -9999px;
+    }
+
+    #priceSort {
+      background: #333;
+      color: white;
+    }
+
     .car {
       background: #1e1e1e;
       padding: 1rem;
@@ -19,9 +53,9 @@
       transition: transform 0.3s ease;
       position: relative;
     }
-    .car:hover {
-      transform: scale(1.01);
-    }
+
+    .car:hover { transform: scale(1.01); }
+
     .car img {
       width: 100%;
       max-height: 220px;
@@ -29,6 +63,7 @@
       border-radius: 8px;
       margin-bottom: 0.5rem;
     }
+
     .car h2 {
       color: #FFD700;
       margin: 0.5rem 0;
@@ -36,33 +71,7 @@
       font-weight: bold;
       font-size: 1.1rem;
     }
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .filters input, .filters select {
-      padding: 0.6rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: none;
-    }
-    #search {
-      flex: 1;
-      background: #333;
-      color: white;
-    }
-    #brandFilter {
-      width: 40px;
-      background: #FFD700 url('https://img.icons8.com/ios-filled/24/000000/filter.png') no-repeat center;
-      background-size: 20px;
-      text-indent: -9999px;
-    }
-    #priceSort {
-      background: #333;
-      color: white;
-    }
+
     .vendido-label {
       position: absolute;
       top: 8px;
@@ -74,24 +83,38 @@
       font-size: 0.8rem;
       font-weight: bold;
     }
-    .categorias {
+
+    .tipo-vehiculos {
+      margin-bottom: 2rem;
+    }
+
+    .tipo-vehiculos h2 {
+      margin-bottom: 1rem;
+    }
+
+    .tipos-grid {
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
       gap: 1rem;
-      margin: 2rem 0;
+      flex-wrap: wrap;
     }
-    .categoria-item {
+
+    .tipos-grid .tipo {
       text-align: center;
     }
-    .categoria-item img {
-      width: 110px;
-      height: 80px;
-      object-fit: cover;
+
+    .tipos-grid .tipo img {
+      width: 100px;
+      height: 100px;
       border-radius: 12px;
+      object-fit: cover;
     }
-    .categoria-item p {
-      margin-top: 0.3rem;
+
+    @media(min-width: 768px) {
+      .tipos-grid .tipo img {
+        width: 150px;
+        height: 150px;
+      }
     }
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -101,7 +124,9 @@
   <header>
     <img src="https://i.postimg.cc/8zXCkRFm/Imagen-de-Whats-App-2025-04-29-a-las-12-02-33-41dfd301.jpg" alt="Logo Autos Maravilla" />
     <h1>Autos Maravilla</h1>
-  </header>  <div class="filters">
+  </header>
+
+  <div class="filters">
     <input type="text" id="search" placeholder="Buscar vehículo por nombre...">
     <select id="brandFilter" title="Filtrar por marca">
       <option value="Todas" selected></option>
@@ -111,23 +136,33 @@
       <option value="asc">Más barato</option>
       <option value="desc">Más caro</option>
     </select>
-  </div>  <h2>Tipos de vehículos</h2>
-  <div class="categorias">
-    <div class="categoria-item">
-      <img src="https://i.postimg.cc/x10k48sJ/file-00000000dc1061f7818c7bc6e0497268.png" alt="Camioneta">
-      <p>Camioneta</p>
+  </div>
+
+  <div class="tipo-vehiculos">
+    <h2>Tipos de vehículos</h2>
+    <div class="tipos-grid">
+      <div class="tipo">
+        <img src="https://i.postimg.cc/x10k48sJ/file-00000000dc1061f7818c7bc6e0497268.png" alt="Camioneta">
+        <p>Camioneta</p>
+      </div>
+      <div class="tipo">
+        <img src="https://i.postimg.cc/TwWhDDPS/file-000000001b5c61f7b274c512822aa0cd.png" alt="Sedán">
+        <p>Sedán</p>
+      </div>
+      <div class="tipo">
+        <img src="https://i.postimg.cc/xdZc8R9M/file-00000000dba461f7aef4cc70229dbb46.png" alt="Premium">
+        <p>Premium</p>
+      </div>
     </div>
-    <div class="categoria-item">
-      <img src="https://i.postimg.cc/TwWhDDPS/file-000000001b5c61f7b274c512822aa0cd.png" alt="Sedán">
-      <p>Sedán</p>
-    </div>
-    <div class="categoria-item">
-      <img src="https://i.postimg.cc/xdZc8R9M/file-00000000dba461f7aef4cc70229dbb46.png" alt="Premium">
-      <p>Premium</p>
-    </div>
-  </div>  <h2>Vehículos Disponibles</h2>
-  <div id="catalog"></div>  <h2>Vehículos Vendidos</h2>
-  <div id="vendidos"></div>  <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
+  </div>
+
+  <h2>Vehículos Disponibles</h2>
+  <div id="catalog"></div>
+
+  <h2>Vehículos Vendidos</h2>
+  <div id="vendidos"></div>
+
+  <div style="position: fixed; top: 40%; right: 10px; z-index: 999;">
     <a href="https://wa.me/50253083929" target="_blank" style="display:block;margin-bottom:10px;">
       <img src="https://img.icons8.com/ios-filled/50/FFD700/whatsapp--v1.png"
            style="width:45px;height:45px;background:black;padding:6px;border-radius:50%;" />
@@ -136,7 +171,9 @@
       <img src="https://img.icons8.com/ios-filled/50/FFD700/facebook-new.png"
            style="width:45px;height:45px;background:black;padding:6px;border-radius:50%;" />
     </a>
-  </div>  <script>
+  </div>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBcoM5H6GLk7Gqb-Dd-t6frp-AKjgeQZCQ",
       authDomain: "autos-maravilla-fb60f.firebaseapp.com",
@@ -232,5 +269,6 @@
     searchInput.addEventListener("input", applyFilters);
     brandFilter.addEventListener("change", applyFilters);
     priceSort.addEventListener("change", applyFilters);
-  </script></body>
+  </script>
+</body>
 </html>
